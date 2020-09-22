@@ -1,14 +1,15 @@
 ---
-- name: Creating new Ports
-  hosts: 192.168.150.40
-  gather_facts: no
-  connection: local
+  - name: Creating new Ports
+    hosts: 192.168.150.40
+    gather_facts: no
+    connection: local
 
-  tasks:
-    - name: configure Port using CLI
-       comware_command:
+    tasks:
+
+      - name: configure Port using CLI
+        comware_command:
            command:
-                - int g6/0        
+                - int g6/0
                 - description XXX
                 - port link-mode bridge
                 - port link-type trunk
@@ -20,5 +21,5 @@
            password: "{{ password }}"
            hostname: "{{ inventory_hostname }}"
 
-       register: print_output
-    - debug: var=print_output
+        register: print_output
+      - debug: var=print_output
