@@ -1,6 +1,6 @@
 ---
   - name: Creating new Ports
-    hosts: HP1
+    hosts: 192.168.150.40
     gather_facts: no
     connection: local
 
