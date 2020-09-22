@@ -4,10 +4,6 @@
     gather_facts: no
     connection: local
 
-    vars:
-      username: khurram
-      password: cisco123
-
     tasks:
 
       - name: configure Port using CLI
