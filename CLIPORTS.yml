@@ -18,7 +18,7 @@
            type: config
            username: "{{ username }}"
            password: "{{ password }}"
-#           hostname: "{{ 192.168.150.40 }}"
+           hostname: "{{ 192.168.150.40 }}"
 
         register: print_output
       - debug: var=print_output
