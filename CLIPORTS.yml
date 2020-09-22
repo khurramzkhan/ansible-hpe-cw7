@@ -1,0 +1,24 @@
+---
+- name: Creating new Ports
+  hosts: 192.168.150.40
+  gather_facts: no
+  connection: local
+
+  tasks:
+    - name: configure Port using CLI
+       comware_command:
+           command:
+                - int g6/0        
+                - description XXX
+                - port link-mode bridge
+                - port link-type trunk
+                - undo port trunk permit vlan 1
+                - port trunk permit vlan 91
+                - no shut
+           type: config
+           username: "{{ username }}"
+           password: "{{ password }}"
+           hostname: "{{ inventory_hostname }}"
+
+       register: print_output
+    - debug: var=print_output
