@@ -1,7 +1,7 @@
 ---
   - name: Creating new Ports
     hosts: 192.168.150.40
-    gather_facts: no
+    gather_facts: False 
     connection: local
 
     tasks:
@@ -19,7 +19,7 @@
            type: config
            username: "{{ username }}"
            password: "{{ password }}"
-           hostname: "{{ inventory_hostname }}"
+           hostname: "{{ 192.168.150.40 }}"
 
         register: print_output
       - debug: var=print_output
