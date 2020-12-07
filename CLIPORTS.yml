@@ -8,7 +8,7 @@
       - name: configure Port using CLI
         comware_command:
            command:
-                - int ge1/0/1
+                - int GigabitEthernet 1/0/1
                 - description ANSIBLE
                 - port link-mode bridge
                 - port link-type access
