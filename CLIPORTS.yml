@@ -4,20 +4,27 @@
     gather_facts: no
     connection: local
 
+    vars:
+      name: "interface"
+      name: "description"
+      name: "state"
+      name: "vlan"
+      name: "no shut"
+    
     tasks:
-      - name: configure Port using CLI
-        comware_command:
+    - name: configure Port using CLI
+      comware_command:
            command:
-                - int GigabitEthernet 1/0/1
-                - description ANSIBLE
+                - int {{ interface }}
+                - description {{ description }}
+                - {{ state }}
                 - port link-mode bridge
                 - port link-type access
                 - port access vlan 1
-                - no shut
            type: config
            username: "{{ username }}"
            password: "{{ password }}"
            hostname: "{{ inventory_hostname }}"
 
-        register: print_output
-      - debug: var=print_output
+      register: print_output
+    - debug: var=print_output
