@@ -14,5 +14,5 @@
            password: "{{ password }}"
            hostname: "{{ inventory_hostname }}"
 
-        register: print_output
+        register: response
       - debug: var=response
