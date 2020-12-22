@@ -4,29 +4,8 @@
     gather_facts: no
     connection: local
 
- #   vars_prompt:
- #        - name: "host"
- #          private: no
- #          prompt: "Please enter the host name to be configured"
- #        - name: "interface"
- #          private: no
- #          prompt: "Please enter the Interface # to be configured"
- #        - name: "description"
- #          private: no
- #          prompt: "Please enter a short description of the port"
- #        - name: "state"
- #          private: no
- #          prompt: "Please state the state if the port"
- #        - name: "vlan"
- #          private: no
- #          prompt: "Please enter the Vlan# to be configured"
- #        - name: "vlan_description"
- #          private: no
- #          prompt: "Please enter vlan name. This will only be used if Vlan is not configured"
-
-
     tasks:
-      - name: Checking Port state to be configured
+      - name: BEGINING PORT CONFIGURATION  
         comware_command:
            command:
                - display interface brief | i {{ interface }}
@@ -38,10 +17,8 @@
 
         register: print_output_1
 
-      - debug:
-         var: print_output_1
-
-
+#      - debug:
+#         var: print_output_1
 
       - block:
          - name: "CHECKING PORT STATUS"
@@ -51,7 +28,7 @@
          - meta: end_play
         when: '"UP" in print_output_1.response'
 
-      - name: Port is available beginning configuration
+      - name: PORT IS AVAILABLE BEGINING CONFIGURATION 
         comware_command:
            command:
                 - int GigabitEthernet {{ interface }}
@@ -66,11 +43,10 @@
 
         register: print_output_2
 
-      - debug:
-          var: print_output_2
+#      - debug:
+#          var: print_output_2
 
-
-      - name: Checking Vlan availability
+      - name: CHECKING VLAN AVAILABILITY 
         comware_command:
           command:
                 - vlan {{ vlan }}
@@ -84,7 +60,7 @@
         when: '"This VLAN does not exist." in print_output_1.response'
         register: print_output_3
       - debug:
-          msg: Vlan is not available creating new L2 Vlan
+          msg: VLAN IS NOT CONFIGURED. CREATING A NEW L2 VLAN
         when: '"This VLAN does not exist." in print_output_1.response'
 
       - name: VLAN & PORT ARE READY, FINALIZING CONFIGURATION
@@ -105,7 +81,7 @@
 
         register: print_output_4
       - debug:
-          var: print_output_4
-#          msg:
-#           - PORT CONFIGURED SUCCESSFULLY
+#          var: print_output_4
+          msg:
+           - PORT CONFIGURED SUCCESSFULLY
 
