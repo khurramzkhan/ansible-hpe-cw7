@@ -1,0 +1,111 @@
+---
+  - name: Port Configuration Request
+    hosts: "{{host}}"
+    gather_facts: no
+    connection: local
+
+ #   vars_prompt:
+ #        - name: "host"
+ #          private: no
+ #          prompt: "Please enter the host name to be configured"
+ #        - name: "interface"
+ #          private: no
+ #          prompt: "Please enter the Interface # to be configured"
+ #        - name: "description"
+ #          private: no
+ #          prompt: "Please enter a short description of the port"
+ #        - name: "state"
+ #          private: no
+ #          prompt: "Please state the state if the port"
+ #        - name: "vlan"
+ #          private: no
+ #          prompt: "Please enter the Vlan# to be configured"
+ #        - name: "vlan_description"
+ #          private: no
+ #          prompt: "Please enter vlan name. This will only be used if Vlan is not configured"
+
+
+    tasks:
+      - name: Checking Port state to be configured
+        comware_command:
+           command:
+               - display interface brief | i {{ interface }}
+               - display vlan {{ vlan }}
+           type: display
+           username: "{{ username }}"
+           password: "{{ password }}"
+           hostname: "{{ inventory_hostname }}"
+
+        register: print_output_1
+
+      - debug:
+         var: print_output_1
+
+
+
+      - block:
+         - name: "CHECKING PORT STATUS"
+           debug:
+             msg: "PORT IS IN USE PLEASE CONTACT REQUESTER"
+
+         - meta: end_play
+        when: '"UP" in print_output_1.response'
+
+      - name: Port is available beginning configuration
+        comware_command:
+           command:
+                - int GigabitEthernet {{ interface }}
+                - undo port link-mode
+                - exit   
+           type: config
+           username: "{{ username }}"
+           password: "{{ password }}"
+           hostname: "{{ inventory_hostname }}"
+
+        when: '"DOWN" in print_output_1.response'
+
+        register: print_output_2
+
+      - debug:
+          var: print_output_2
+
+
+      - name: Checking Vlan availability
+        comware_command:
+          command:
+                - vlan {{ vlan }}
+                - name {{ vlan_description }}
+                - exit
+          type: config
+          username: "{{ username }}"
+          password: "{{ password }}"
+          hostname: "{{ inventory_hostname }}"
+
+        when: '"This VLAN does not exist." in print_output_1.response'
+        register: print_output_3
+      - debug:
+          msg: Vlan is not available creating new L2 Vlan
+         when: '"This VLAN does not exist." in print_output_1.response'
+
+      - name: VLAN & PORT ARE READY, FINALIZING CONFIGURATION
+        comware_command:
+           command:
+                - int GigabitEthernet {{ interface }}
+                - "{{ state }}"
+                - port link-mode bridge
+                - port link-type access
+                - port access vlan {{ vlan }}
+                - description {{ description }}
+           type: config
+           username: "{{ username }}"
+           password: "{{ password }}"
+           hostname: "{{ inventory_hostname }}"
+
+        when: '"{{ vlan }}" in print_output_1.response'
+
+        register: print_output_4
+      - debug:
+          var: print_output_4
+#          msg:
+#           - PORT CONFIGURED SUCCESSFULLY
+
