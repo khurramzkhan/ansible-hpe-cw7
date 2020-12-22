@@ -85,7 +85,7 @@
         register: print_output_3
       - debug:
           msg: Vlan is not available creating new L2 Vlan
-         when: '"This VLAN does not exist." in print_output_1.response'
+        when: '"This VLAN does not exist." in print_output_1.response'
 
       - name: VLAN & PORT ARE READY, FINALIZING CONFIGURATION
         comware_command:
