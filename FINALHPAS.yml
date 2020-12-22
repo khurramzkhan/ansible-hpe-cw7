@@ -32,7 +32,6 @@
         comware_command:
            command:
                 - int GigabitEthernet {{ interface }}
-                - undo port link-mode
                 - exit   
            type: config
            username: "{{ username }}"
@@ -68,9 +67,6 @@
            command:
                 - int GigabitEthernet {{ interface }}
                 - "{{ state }}"
-                - port link-mode bridge
-                - port link-type access
-                - port access vlan {{ vlan }}
                 - description {{ description }}
            type: config
            username: "{{ username }}"
