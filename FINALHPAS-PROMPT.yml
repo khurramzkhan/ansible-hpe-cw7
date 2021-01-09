@@ -3,14 +3,13 @@
     hosts: "{{host}}"
     gather_facts: no
     connection: local
-    
+ 
     tasks:
       - name: BEGINING CONFIGURATION
         comware_command:
            command:
-               - display interface brief | i {{ interface }}
+               - display interface {{ interface }}
                - display vlan {{ vlan }}
-
            type: display
            username: "{{ username }}"
            password: "{{ password }}"
@@ -36,7 +35,7 @@
         block:
             - name: VERIFYING DETAILS
               pause:
-               prompt: THE PORT IS AVAILABLE. CURRENT STATE IS DOWN. DO YOU WANT TO CONTINUE (yes/no)?
+               prompt: THE PORT IS AVAILABLE WITH CURRENT STATE DOWN. DO YOU WANT TO CONTINUE (yes/no)?
               register: pause_prompt
             - debug:
                 msg: "PORT REQUEST IS CANCELLED BASED ON REQUESTER INPUT"
@@ -91,7 +90,7 @@
            password: "{{ password }}"
            hostname: "{{ inventory_hostname }}"
 
-        when: '"{{ vlan }}" in print_output_1.response'
+       when: '"{{ vlan }}" in print_output_1.response'
 
         register: print_output_4
 
