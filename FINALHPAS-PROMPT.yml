@@ -73,7 +73,7 @@
         register: print_output_3
 
       - debug:
-          msg: VLAN {{ vlan }} IS NOT AVAILABLE. CREATING A NEW L2 VLAN 
+          msg: VLAN {{ vlan }} DOES NOT EXIST ON THIS SWITCH. CREATING A NEW L2 VLAN
         when: '"This VLAN does not exist." in print_output_1.response'
 
      - name: VLAN AND PORT ARE READY. FINISHING CONFIGURATION 
