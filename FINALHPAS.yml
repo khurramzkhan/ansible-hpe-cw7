@@ -1,5 +1,5 @@
 ---
-  - name: Port Configuration Request
+  - name: ACCESS-PORT CONFIGURATION REQUEST 
     hosts: "{{host}}"
     gather_facts: no
     connection: local
@@ -8,7 +8,7 @@
       - name: BEGINING PORT CONFIGURATION  
         comware_command:
            command:
-               - display interface brief | i {{ interface }}
+               - display interface {{ interface }}
                - display vlan {{ vlan }}
            type: display
            username: "{{ username }}"
@@ -16,14 +16,13 @@
            hostname: "{{ inventory_hostname }}"
 
         register: print_output_1
-
+        ignore_errors: yes
 #      - debug:
 #         var: print_output_1
-
       - block:
          - name: "CHECKING PORT STATUS"
            debug:
-             msg: "PORT IS IN USE PLEASE CONTACT REQUESTER"
+             msg: "PORT IS CURRENTLY IN USE. PLEASE CONTACT REQUESTER"
 
          - meta: end_play
         when: '"UP" in print_output_1.response'
@@ -31,7 +30,7 @@
       - name: PORT IS AVAILABLE BEGINING CONFIGURATION 
         comware_command:
            command:
-                - int GigabitEthernet {{ interface }}
+                - int {{ interface }}
                 - undo port link-mode
                 - exit   
            type: config
@@ -42,10 +41,9 @@
         when: '"DOWN" in print_output_1.response'
 
         register: print_output_2
-
+        ignore_errors: yes
 #      - debug:
 #          var: print_output_2
-
       - name: CHECKING VLAN AVAILABILITY 
         comware_command:
           command:
@@ -59,14 +57,15 @@
 
         when: '"This VLAN does not exist." in print_output_1.response'
         register: print_output_3
+        ignore_errors: yes
       - debug:
-          msg: VLAN IS NOT CONFIGURED. CREATING A NEW L2 VLAN
+          msg: THIS VLAN DOES NOT EXIST ON THIS SWITCH. CREATING A NEW L2 VLAN
         when: '"This VLAN does not exist." in print_output_1.response'
 
       - name: VLAN & PORT ARE READY, FINALIZING CONFIGURATION
         comware_command:
            command:
-                - int GigabitEthernet {{ interface }}
+                - int {{ interface }}
                 - "{{ state }}"
                 - port link-mode bridge
                 - port link-type access
@@ -80,8 +79,9 @@
         when: '"{{ vlan }}" in print_output_1.response'
 
         register: print_output_4
+        ignore_errors: yes
       - debug:
 #          var: print_output_4
-          msg:
-           - PORT CONFIGURED SUCCESSFULLY
+          msg: 
+             ACCESS-PORT CONFIGURED SUCCESSFULLY
 
