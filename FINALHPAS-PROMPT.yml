@@ -1,0 +1,112 @@
+---
+  - name: ACESS-PORT CONFIGURATION REQUEST
+    hosts: "{{host}}"
+    gather_facts: no
+    connection: local
+    
+    tasks:
+      - name: BEGINING CONFIGURATION
+        comware_command:
+           command:
+               - display interface brief | i {{ interface }}
+               - display vlan {{ vlan }}
+
+           type: display
+           username: "{{ username }}"
+           password: "{{ password }}"
+           hostname: "{{ inventory_hostname }}"
+
+        register: print_output_1
+
+      - name: VERIFYING DETAILS
+        block:
+            - name: CHECKING PORT STATUS
+              pause:
+               prompt: THE PORT IS UP AND ALREADY IN USE. DO YOU WANT TO CONTINUE (yes/no)?
+              register: pause_prompt
+
+            - debug:
+                 msg: "ACCESS-PORT REQUEST IS CANCELLED BY REQUEST"
+            - meta: end_play
+              when: '"no" in pause_prompt.user_input'
+
+        when: '"UP" in print_output_1.response'
+        
+      - name: STARTING ACCESS-PORT CONFIGURATION
+        block:
+            - name: VERIFYING DETAILS
+              pause:
+               prompt: THE PORT IS AVAILABLE. CURRENT STATE IS DOWN. DO YOU WANT TO CONTINUE (yes/no)?
+              register: pause_prompt
+            - debug:
+                msg: "PORT REQUEST IS CANCELLED BASED ON REQUESTER INPUT"
+            - meta: end_play
+              when: '"no" in pause_prompt.user_input'
+
+        when: '"DOWN" in print_output_1.response'
+
+      - name: FINALIZING PORT CONFIGURATION 
+        comware_command:
+           command:
+                - int {{ interface }}
+                - undo port link-mode
+           type: config
+           username: "{{ username }}"
+           password: "{{ password }}"
+           hostname: "{{ inventory_hostname }}"
+
+        when: '"DOWN" in print_output_1.response'
+        register: print_output_2
+
+      - name: CHECKING VLAN AVAILABILITY
+        comware_command:
+          command:
+                - vlan {{ vlan }}
+                - name {{ vlan_description }}
+                - exit
+          type: config
+          username: "{{ username }}"
+          password: "{{ password }}"
+          hostname: "{{ inventory_hostname }}"
+
+        when: '"This VLAN does not exist." in print_output_1.response'
+        register: print_output_3
+
+      - debug:
+          msg: VLAN {{ vlan }} IS NOT AVAILABLE. CREATING A NEW L2 VLAN 
+        when: '"This VLAN does not exist." in print_output_1.response'
+
+     - name: VLAN AND PORT ARE READY. FINISHING CONFIGURATION 
+        comware_command:
+           command:
+                - int {{ interface }}
+                - "{{ state }}"
+                - port link-mode bridge
+                - port link-type access
+                - port access vlan {{ vlan }}
+                - description {{ description }}
+
+           type: config
+           username: "{{ username }}"
+           password: "{{ password }}"
+           hostname: "{{ inventory_hostname }}"
+
+        when: '"{{ vlan }}" in print_output_1.response'
+
+        register: print_output_4
+
+      - debug:
+          msg: 
+             ACCESS-PORT CONFIGURED SUCCESSFULLY
+
+
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
