@@ -27,7 +27,7 @@
          - meta: end_play
         when: '"UP" in print_output_1.response'
 
-      - name: PORT IS AVAILABLE BEGINING CONFIGURATION 
+      - name: PORT IS AVAILABLE, BEGINING CONFIGURATION 
         comware_command:
            command:
                 - int {{ interface }}
@@ -59,7 +59,7 @@
         register: print_output_3
         ignore_errors: yes
       - debug:
-          msg: THIS VLAN DOES NOT EXIST ON THIS SWITCH. CREATING A NEW L2 VLAN
+          msg: VLAN {{ vlan }} DOES NOT EXIST ON THIS SWITCH. CREATING A NEW L2 VLAN
         when: '"This VLAN does not exist." in print_output_1.response'
 
       - name: VLAN & PORT ARE READY, FINALIZING CONFIGURATION
