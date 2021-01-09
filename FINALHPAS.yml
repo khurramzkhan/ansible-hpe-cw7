@@ -81,7 +81,7 @@
         register: print_output_4
         ignore_errors: yes
       - debug:
-#          var: print_output_4
+#          var: print_output_4:
           msg: 
              ACCESS-PORT CONFIGURED SUCCESSFULLY
 
