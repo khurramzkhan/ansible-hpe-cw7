@@ -25,7 +25,7 @@
              msg: "PORT IS CURRENTLY IN USE. PLEASE CONTACT REQUESTER"
 
          - meta: end_play
-        when: '"UP" in print_output_1.response'
+        when: '"Current state: UP" in print_output_1.response'
 
       - name: PORT IS AVAILABLE, BEGINING CONFIGURATION 
         comware_command:
