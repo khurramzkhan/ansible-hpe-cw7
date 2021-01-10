@@ -22,12 +22,12 @@
       - block:
          - name: "CHECKING PORT STATUS"
            debug:
-             msg: "PORT IS CURRENTLY IN USE. PLEASE CONTACT REQUESTER"
+             msg: "PORT {{ interface }} IS CURRENTLY IN USE. PLEASE CONTACT REQUESTER"
 
          - meta: end_play
         when: '"Current state: UP" in print_output_1.response'
 
-      - name: PORT IS AVAILABLE, BEGINING CONFIGURATION 
+      - name: PORT {{ interface }} IS AVAILABLE, BEGINING CONFIGURATION 
         comware_command:
            command:
                 - int {{ interface }}
@@ -44,7 +44,7 @@
         ignore_errors: yes
 #      - debug:
 #          var: print_output_2
-      - name: CHECKING VLAN AVAILABILITY 
+      - name: CHECKING VLAN AVAILABILITY FOR VLAN {{ vlan }} 
         comware_command:
           command:
                 - vlan {{ vlan }}
@@ -83,5 +83,5 @@
       - debug:
 #          var: print_output_4:
           msg: 
-             ACCESS-PORT CONFIGURED SUCCESSFULLY
+             ACCESS-PORT {{ interface }} CONFIGURED SUCCESSFULLY WITH VLAN {{ vlan }}
 
