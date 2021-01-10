@@ -17,8 +17,8 @@
 
         register: print_output_1
 
-      - name: VERIFYING DETAILS
-        block:
+ #     - name: VERIFYING DETAILS
+      - block:
             - name: CHECKING PORT STATUS
               pause:
                prompt: THE PORT IS UP AND ALREADY IN USE. DO YOU WANT TO CONTINUE (yes/no)?
