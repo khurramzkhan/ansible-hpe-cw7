@@ -17,8 +17,8 @@
 
         register: print_output_1
 
- #     - name: VERIFYING DETAILS
-      - block:
+      - name: VERIFYING DETAILS
+        block:
             - name: CHECKING PORT STATUS
               pause:
                prompt: THE PORT IS UP AND ALREADY IN USE. DO YOU WANT TO CONTINUE (yes/no)?
@@ -76,7 +76,7 @@
         when: '"This VLAN does not exist." in print_output_1.response'
 
      - name: VLAN AND PORT ARE READY. FINISHING CONFIGURATION 
-        comware_command:
+       comware_command:
            command:
                 - int {{ interface }}
                 - "{{ state }}"
@@ -92,11 +92,11 @@
 
        when: '"{{ vlan }}" in print_output_1.response'
 
-        register: print_output_4
+       register: print_output_4
 
-      - debug:
-          msg: 
-             ACCESS-PORT CONFIGURED SUCCESSFULLY
+     - debug:
+         msg: 
+            ACCESS-PORT CONFIGURED SUCCESSFULLY
 
 
 
