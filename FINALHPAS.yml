@@ -16,9 +16,9 @@
            hostname: "{{ inventory_hostname }}"
 
         register: print_output_1
- #       ignore_errors: yes
-      - debug:
-         var: print_output_1
+        ignore_errors: yes
+#      - debug:
+#         var: print_output_1
       - block:
          - name: "CHECKING PORT STATUS"
            debug:
@@ -38,7 +38,7 @@
            password: "{{ password }}"
            hostname: "{{ inventory_hostname }}"
 
-        when: '"Current state: DOWN" in print_output_1.response'
+        when: '"DOWN" in print_output_1.response'
 
         register: print_output_2
         ignore_errors: yes
