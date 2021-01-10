@@ -20,7 +20,7 @@
 #      - debug:
 #         var: print_output_1
       - block:
-         - name: "CHECKING PORT STATUS"
+         - name: "CHECKING PORT STATUS FOR {{ interface }}"
            debug:
              msg: "PORT {{ interface }} IS CURRENTLY IN USE. PLEASE CONTACT REQUESTER"
 
