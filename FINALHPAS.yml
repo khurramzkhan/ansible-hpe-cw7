@@ -17,8 +17,8 @@
 
         register: print_output_1
         ignore_errors: yes
-#      - debug:
-#         var: print_output_1
+      - debug:
+         var: print_output_1
       - block:
          - name: "CHECKING PORT STATUS"
            debug:
