@@ -1,4 +1,3 @@
 127.0.0.1 localhost
 127.0.1.1 Ansible
-
-172.28.151.251 HP1
+HP1 ansible_host=172.28.151.251
