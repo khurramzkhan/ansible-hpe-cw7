@@ -1,0 +1,69 @@
+---
+  - name: ACCESS-PORT DESCRIPTION CONFIGURATION REQUEST
+    hosts: "{{host}}"
+    gather_facts: no
+    connection: local
+
+    vars_prompt:
+         - name: "host"
+           private: no
+           prompt: "Please enter the host name"
+         - name: "interface"
+           private: no
+           prompt: "Please enter the Interface # to be configured with new description"
+         - name: "description"
+           private: no
+           prompt: "Please enter the desired description on the port"
+
+    tasks:
+      - name: BEGINING CONFIGURATION
+        comware_command:
+           command:
+               - display current-configuration interface {{ interface }} | i des
+           type: display
+           username: "{{ username }}"
+           password: "{{ password }}"
+           hostname: "{{ inventory_hostname }}"
+
+        register: print_output_1
+      - set_fact:
+          print_output_2: "{{print_output_1.response.split(' ') }}"
+        when: '"description" in print_output_1.response'
+      - set_fact:
+          print_output_3: "{{print_output_2[8] | regex_replace('\\r\\n','') }}"
+#          - debug:
+#              var=print_output_3
+        when: '"description" in print_output_1.response'
+      - block:
+          - name: VERIFYING EXISTING CONFIGURATIONS
+            pause:
+              prompt: CHANGING PORT DESCRIPTION FOR {{ interface }} FROM {{ print_output_3 }} TO {{ description }}.
+                      DO YOU WANT TO CONTINUE (yes/no)?
+            register: pause_prompt
+#          - debug:
+          - debug:
+              msg: "PORT REQUEST IS CANCELLED BASED ON REQUESTER INPUT"
+            when: '"no" in pause_prompt.user_input'
+          - meta: end_play
+            when: '"no" in pause_prompt.user_input'
+
+        when: '"description" in print_output_1.response'
+
+      - name: FINALIZING CONFIGURATION
+        comware_command:
+           command:
+                - int {{ interface }}
+                - description {{ description }}
+                - exit
+           type: config
+           username: "{{ username }}"
+           password: "{{ password }}"
+           hostname: "{{ inventory_hostname }}"
+
+        register: print_output_4
+
+      - debug:
+          msg: "PORT {{ interface }} HAS NO DESCRIPTION CONFIGURED. CONFIGURING {{ description }} AS CURRENT DESCRIPTION"
+        when: '"description" not in print_output_1.response'
+      - debug:
+          msg: "ACCESS-PORT {{ interface }} DESCRIPTION CONFIGURED SUCCESSFULLY to {{ description }}"
