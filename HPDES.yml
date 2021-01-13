@@ -4,17 +4,6 @@
     gather_facts: no
     connection: local
 
-    vars_prompt:
-         - name: "host"
-           private: no
-           prompt: "Please enter the host name"
-         - name: "interface"
-           private: no
-           prompt: "Please enter the Interface # to be configured with new description"
-         - name: "description"
-           private: no
-           prompt: "Please enter the desired description on the port"
-
     tasks:
       - name: BEGINING CONFIGURATION
         comware_command:
