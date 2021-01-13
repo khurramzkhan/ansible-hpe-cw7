@@ -4,26 +4,6 @@
     gather_facts: no
     connection: local
 
-    vars_prompt:
-         - name: "host"
-           private: no
-           prompt: "Please enter the host name to be configured"
-         - name: "interface"
-           private: no
-           prompt: "Please enter the Interface # to be configured"
-         - name: "description"
-           private: no
-           prompt: "Please enter a short description of the port"
-         - name: "state"
-           private: no
-           prompt: "Please state the state if the port"
-         - name: "vlan"
-           private: no
-           prompt: "Please enter the Vlan# to be configured"
-         - name: "vlan_description"
-           private: no
-           prompt: "Please enter vlan name. This will only be used if Vlan is not configured"
-
     tasks:
       - name: BEGINING CONFIGURATION
         comware_command:
