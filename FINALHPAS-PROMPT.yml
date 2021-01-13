@@ -1,14 +1,34 @@
 ---
-  - name: ACESS-PORT CONFIGURATION REQUEST
+  - name: ACCESS-PORT CONFIGURATION REQUEST
     hosts: "{{host}}"
     gather_facts: no
     connection: local
- 
+
+    vars_prompt:
+         - name: "host"
+           private: no
+           prompt: "Please enter the host name to be configured"
+         - name: "interface"
+           private: no
+           prompt: "Please enter the Interface # to be configured"
+         - name: "description"
+           private: no
+           prompt: "Please enter a short description of the port"
+         - name: "state"
+           private: no
+           prompt: "Please state the state if the port"
+         - name: "vlan"
+           private: no
+           prompt: "Please enter the Vlan# to be configured"
+         - name: "vlan_description"
+           private: no
+           prompt: "Please enter vlan name. This will only be used if Vlan is not configured"
+
     tasks:
       - name: BEGINING CONFIGURATION
         comware_command:
            command:
-               - display interface {{ interface }}
+               - display interface brief | i {{ interface }}
                - display vlan {{ vlan }}
            type: display
            username: "{{ username }}"
@@ -17,34 +37,36 @@
 
         register: print_output_1
 
-      - name: VERIFYING DETAILS
-        block:
-            - name: CHECKING PORT STATUS
-              pause:
-               prompt: THE PORT IS UP AND ALREADY IN USE. DO YOU WANT TO CONTINUE (yes/no)?
-              register: pause_prompt
+      - block:
+           - name: CHECKING PORT STATUS
+             pause:
+              prompt: THE PORT IS UP AND ALREADY IN USE. DO YOU WANT TO CONTINUE (yes/no)?
+             register: pause_prompt
 
-            - debug:
-                 msg: "ACCESS-PORT REQUEST IS CANCELLED BY REQUEST"
-            - meta: end_play
-              when: '"no" in pause_prompt.user_input'
+           - debug:
+               msg: "PORT REQUEST IS CANCELLED BASED ON REQUESTER INPUT"
+             when: '"no" in pause_prompt.user_input'
+           - meta: end_play
+             when: '"no" in pause_prompt.user_input'
 
         when: '"UP" in print_output_1.response'
-        
-      - name: STARTING ACCESS-PORT CONFIGURATION
-        block:
-            - name: VERIFYING DETAILS
-              pause:
-               prompt: THE PORT IS AVAILABLE WITH CURRENT STATE DOWN. DO YOU WANT TO CONTINUE (yes/no)?
-              register: pause_prompt
-            - debug:
-                msg: "PORT REQUEST IS CANCELLED BASED ON REQUESTER INPUT"
-            - meta: end_play
-              when: '"no" in pause_prompt.user_input'
 
+
+      - block:
+           - name: VERIFYING EXISTING CONFIGURATION
+             pause:
+              prompt: THE PORT IS DOWN AND AVAILABLE. DO YOU WANT TO CONTINUE (yes/no)?
+             register: pause_prompt
+#            - debug:
+#                var=pause_prompt
+           - debug:
+               msg: "PORT REQUEST IS CANCELLED BASED ON REQUESTER INPUT"
+             when: '"no" in pause_prompt.user_input'
+           - meta: end_play
+             when: '"no" in pause_prompt.user_input'
         when: '"DOWN" in print_output_1.response'
 
-      - name: FINALIZING PORT CONFIGURATION 
+      - name: FINALIZING CONFIGURATION
         comware_command:
            command:
                 - int {{ interface }}
@@ -75,8 +97,8 @@
           msg: VLAN {{ vlan }} DOES NOT EXIST ON THIS SWITCH. CREATING A NEW L2 VLAN
         when: '"This VLAN does not exist." in print_output_1.response'
 
-     - name: VLAN AND PORT ARE READY. FINISHING CONFIGURATION 
-       comware_command:
+      - name: VLAN & PORT ARE READY. FINALIZING CONFIGURATION
+        comware_command:
            command:
                 - int {{ interface }}
                 - "{{ state }}"
@@ -90,22 +112,16 @@
            password: "{{ password }}"
            hostname: "{{ inventory_hostname }}"
 
-       when: '"{{ vlan }}" in print_output_1.response'
-
-       register: print_output_4
-
-     - debug:
-         msg: 
-            ACCESS-PORT CONFIGURED SUCCESSFULLY
+        register: print_output_4
+      - debug:
+          msg: ACCESS-PORT {{ interface }} CONFIGURED SUCCESSFULLY WITH VLAN {{ vlan }}
 
 
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
+
