@@ -1,0 +1,31 @@
+---
+  - name: ACCESS-PORT DESCRIPTION CONFIGURATION REQUEST
+    hosts: "{{host}}"
+    gather_facts: no
+    connection: local
+
+    tasks:
+      - name: BEGINING CONFIGURATION
+        comware_command:
+           command:
+               - display current-configuration interface {{ interface }} | i des
+           type: display
+           username: "{{ username }}"
+           password: "{{ password }}"
+           hostname: "{{ inventory_hostname }}"
+
+        register: print_output_1
+
+      - set_fact:
+          print_output_2: "{{print_output_1.response.split(' ') }}"
+      - debug:
+           var=print_output_2
+#        when: '"description" in print_output_1.response'
+#      - set_fact:
+#          print_output_3: "{{print_output_2[8] | regex_replace('\\r\\n','') }}"
+#        when: '"description" in print_output_1.response'
+
+
+
+
+
